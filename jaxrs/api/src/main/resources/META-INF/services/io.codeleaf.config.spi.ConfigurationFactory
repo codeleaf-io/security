@@ -1,0 +1,2 @@
+io.codeleaf.sec.jaxrs.impl.JaxrsHandshakeConfigurationFactory
+io.codeleaf.sec.jaxrs.impl.JaxrsConfigurationFactory

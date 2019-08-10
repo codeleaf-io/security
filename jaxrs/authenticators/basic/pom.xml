@@ -1,0 +1,38 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.codeleaf.sec</groupId>
+        <artifactId>security</artifactId>
+        <version>0.1.0</version>
+        <relativePath>../../..</relativePath>
+    </parent>
+
+    <artifactId>sec-jaxrs-authenticator-basic</artifactId>
+
+    <name>Security :: JAX-RS :: Authenticators :: Basic</name>
+    <description>Jaxrs basic authentication extensions</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-password-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.codeleaf.config</groupId>
+            <artifactId>config-api</artifactId>
+            <version>${leaf-config.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.codeleaf.logging</groupId>
+            <artifactId>logging-slf4j</artifactId>
+            <version>${leaf-logging.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

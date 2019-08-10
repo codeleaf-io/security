@@ -1,0 +1,94 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.codeleaf.release</groupId>
+        <artifactId>release</artifactId>
+        <version>0.1.0</version>
+    </parent>
+
+    <groupId>io.codeleaf.sec</groupId>
+    <artifactId>security</artifactId>
+    <version>0.1.0</version>
+    <packaging>pom</packaging>
+
+    <name>Security Library</name>
+
+    <modules>
+        <module>api</module>
+        <module>stores/client</module>
+        <module>stores/local</module>
+        <module>password/spi</module>
+        <module>password/dummy</module>
+        <module>jaxrs/spi</module>
+        <module>jaxrs/api</module>
+        <module>jaxrs/authenticators/basic</module>
+        <module>jaxrs/protocols/query</module>
+    </modules>
+
+    <developers>
+        <developer>
+            <name>Deepak Shingan</name>
+            <email>deepak.shingan@gmail.com</email>
+            <organization>Deepak Shingan</organization>
+        </developer>
+        <developer>
+            <name>Tom Burger</name>
+            <email>tvburger@gmail.com</email>
+            <organization>TVBurger B.V.</organization>
+            <organizationUrl>http://www.tvburger.net/</organizationUrl>
+        </developer>
+    </developers>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-password-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-password-dummy</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-spi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-authenticator-basic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-protocol-query</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-store-client</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-store-local</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
