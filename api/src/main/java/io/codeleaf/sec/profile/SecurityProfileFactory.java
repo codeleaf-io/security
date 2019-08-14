@@ -2,15 +2,12 @@ package io.codeleaf.sec.profile;
 
 import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.common.behaviors.impl.DefaultRegistry;
-import io.codeleaf.common.utils.Types;
 import io.codeleaf.config.Configuration;
-import io.codeleaf.config.ConfigurationNotFoundException;
-import io.codeleaf.config.ConfigurationProvider;
 import io.codeleaf.config.impl.AbstractConfigurationFactory;
 import io.codeleaf.config.spec.InvalidSettingException;
 import io.codeleaf.config.spec.InvalidSpecificationException;
+import io.codeleaf.config.spec.SettingNotFoundException;
 import io.codeleaf.config.spec.Specification;
-import io.codeleaf.config.spec.impl.MapSpecification;
 import io.codeleaf.config.util.Specifications;
 import io.codeleaf.sec.impl.ThreadLocalSecurityContextManager;
 import io.codeleaf.sec.spi.Authenticator;
@@ -33,10 +30,34 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
     protected SecurityProfile parseConfiguration(Specification specification) throws InvalidSpecificationException {
         Registry registry = new DefaultRegistry();
         Map<String, AuthenticatorNode> authenticatorNodes = parseAuthenticatorNodes(specification, registry);
-        Map<String, Configuration> protocolConfigurations = new LinkedHashMap<>(); // TODO
-        List<SecurityZone> securityZones = new ArrayList<>(); // TODO
+        Map<String, Configuration> protocolConfigurations = parseProtocolConfigurations(specification, registry);
+        List<SecurityZone> securityZones = parseSecurityZones(specification, registry);
         SecurityContextManager securityContextManager = new ThreadLocalSecurityContextManager();
         return new SecurityProfile(registry, authenticatorNodes, protocolConfigurations, securityZones, securityContextManager);
+    }
+
+    private List<SecurityZone> parseSecurityZones(Specification specification, Registry registry) throws SettingNotFoundException, InvalidSettingException {
+        List<SecurityZone> securityZones = new ArrayList<>();
+        for (String zoneName : specification.getChilds("zones")) {
+            securityZones.add(parseSecurityZone(specification, zoneName, registry));
+        }
+        return securityZones;
+    }
+
+    private SecurityZone parseSecurityZone(Specification specification, String zoneName, Registry registry) throws SettingNotFoundException, InvalidSettingException {
+        try {
+            return (SecurityZone) Specifications.parseConfiguration(specification, registry, "zones", zoneName);
+        } catch (ClassCastException cause) {
+            throw new InvalidSettingException(specification, specification.getSetting("zones", zoneName), "Is not extending SecurityZone!");
+        }
+    }
+
+    private Map<String, Configuration> parseProtocolConfigurations(Specification specification, Registry registry) throws SettingNotFoundException, InvalidSettingException {
+        Map<String, Configuration> protocolConfigurations = new LinkedHashMap<>();
+        for (String protocolName : specification.getChilds("protocols")) {
+            protocolConfigurations.put(protocolName, Specifications.parseConfiguration(specification, registry, "protocols", protocolName));
+        }
+        return protocolConfigurations;
     }
 
     private Map<String, AuthenticatorNode> parseAuthenticatorNodes(Specification specification, Registry registry) throws InvalidSpecificationException {
@@ -48,7 +69,6 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
         return authenticatorNodes;
     }
 
-    @SuppressWarnings("unchecked")
     private AuthenticatorNode parseAuthenticatorNode(String authenticatorName, Specification specification, Registry registry) throws InvalidSpecificationException {
         LOGGER.debug("Parsing authenticator: " + authenticatorName + "...");
         String onFailure;
@@ -57,36 +77,11 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
         } else {
             onFailure = null;
         }
-        Class<? extends Authenticator> authenticatorClass = (Class<? extends Authenticator>) parseClass(specification, specification.getSetting("authenticators", authenticatorName, "implementation"));
-        Configuration configuration = parseAuthenticationConfiguration(authenticatorName, specification, registry);
+        Class<? extends Authenticator> authenticatorClass = Specifications.parseClass(specification, Authenticator.class, "authenticators", authenticatorName, "implementation");
+        Configuration configuration = Specifications.parseConfiguration(specification, "authenticators", authenticatorName, "configuration");
         Authenticator authenticator = createAuthenticator(specification, authenticatorName, authenticatorClass, configuration, registry);
         registry.register(authenticatorName, authenticator);
         return new AuthenticatorNode(authenticatorName, authenticator, onFailure);
-    }
-
-    private Class<?> parseClass(Specification specification, Specification.Setting setting) throws InvalidSettingException {
-        if (!(setting.getValue() instanceof String)) {
-            throw new InvalidSettingException(specification, setting, "Implementation must be a String!");
-        }
-        try {
-            return Class.forName((String) setting.getValue());
-        } catch (ClassNotFoundException cause) {
-            throw new InvalidSettingException(specification, setting, "Could not find class: " + setting.getValue(), cause);
-        }
-    }
-
-    private Configuration parseAuthenticationConfiguration(String authenticatorName, Specification specification, Registry registry) throws InvalidSpecificationException {
-        Specification.Setting configTypeSetting = specification.getSetting("authenticators", authenticatorName, "configuration", "type");
-        Class<?> configurationClass = parseClass(specification, configTypeSetting);
-        if (!Configuration.class.isAssignableFrom(configurationClass)) {
-            throw new InvalidSettingException(specification, configTypeSetting, "Configuration type is not implementing Configuration: " + configTypeSetting.getValue());
-        }
-        try {
-            Specification configSpecification = MapSpecification.create(specification, "authenticators", authenticatorName, "configuration", "settings");
-            return ConfigurationProvider.get().parseConfiguration(Types.cast(configurationClass), configSpecification, registry);
-        } catch (ConfigurationNotFoundException cause) {
-            throw new InvalidSettingException(specification, specification.getSetting("authenticators", authenticatorName, "configuration", "settings"), cause.getCause());
-        }
     }
 
     /*

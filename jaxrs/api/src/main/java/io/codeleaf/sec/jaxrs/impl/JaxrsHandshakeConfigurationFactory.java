@@ -1,29 +1,28 @@
 package io.codeleaf.sec.jaxrs.impl;
 
-import io.codeleaf.config.ConfigurationException;
+import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.config.ConfigurationNotFoundException;
 import io.codeleaf.config.ConfigurationProvider;
 import io.codeleaf.config.spec.*;
 import io.codeleaf.config.util.Specifications;
-import io.codeleaf.sec.impl.SecurityProfileAwareConfigurationFactory;
+import io.codeleaf.sec.impl.RegistryAwareConfigurationFactory;
 import io.codeleaf.sec.jaxrs.protocols.query.QuerySessionIdConfiguration;
 import io.codeleaf.sec.jaxrs.protocols.query.QuerySessionIdProtocol;
 import io.codeleaf.sec.jaxrs.spi.JaxrsSessionIdProtocol;
-import io.codeleaf.sec.profile.SecurityProfile;
 import io.codeleaf.sec.spi.SessionDataStore;
 import io.codeleaf.sec.stores.client.ClientSessionDataConfiguration;
 import io.codeleaf.sec.stores.client.ClientSessionDataStore;
 
 import java.io.IOException;
 
-public final class JaxrsHandshakeConfigurationFactory extends SecurityProfileAwareConfigurationFactory<JaxrsHandshakeConfiguration> {
+public final class JaxrsHandshakeConfigurationFactory extends RegistryAwareConfigurationFactory<JaxrsHandshakeConfiguration> {
 
-    private static final JaxrsHandshakeConfiguration DEFAULT;
+    private static final JaxrsHandshakeConfiguration DEFAULT = createDefault();
 
-    static {
+    static JaxrsHandshakeConfiguration createDefault() {
         try {
-            DEFAULT = new JaxrsHandshakeConfiguration("/authn", createDefaultProtocol(), createDefaultStore());
-        } catch (ConfigurationException | IOException cause) {
+            return new JaxrsHandshakeConfiguration("/authn", createDefaultProtocol(), createDefaultStore());
+        } catch (Throwable cause) {
             throw new ExceptionInInitializerError(cause);
         }
     }
@@ -32,12 +31,12 @@ public final class JaxrsHandshakeConfigurationFactory extends SecurityProfileAwa
         super(DEFAULT);
     }
 
-    public JaxrsHandshakeConfiguration parseConfiguration(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
+    public JaxrsHandshakeConfiguration parseConfiguration(Specification specification, Registry registry) throws InvalidSpecificationException {
         try {
             return new JaxrsHandshakeConfiguration(
                     getPath(specification),
-                    getProtocol(specification, securityProfile),
-                    getStore(specification, securityProfile));
+                    getProtocol(specification, registry),
+                    getStore(specification, registry));
         } catch (IllegalArgumentException cause) {
             throw new InvalidSpecificationException(specification, "Can't parse specification: " + cause.getMessage(), cause);
         }
@@ -49,11 +48,11 @@ public final class JaxrsHandshakeConfigurationFactory extends SecurityProfileAwa
                 : DEFAULT.getPath();
     }
 
-    private SessionDataStore getStore(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
+    private SessionDataStore getStore(Specification specification, Registry registry) throws InvalidSpecificationException {
         SessionDataStore sessionDataStore;
         if (specification.hasSetting("store")) {
             String store = Specifications.parseString(specification, "store");
-            sessionDataStore = securityProfile.getRegistry().lookup(store, SessionDataStore.class);
+            sessionDataStore = registry.lookup(store, SessionDataStore.class);
         } else {
             sessionDataStore = DEFAULT.getStore();
         }
@@ -64,11 +63,11 @@ public final class JaxrsHandshakeConfigurationFactory extends SecurityProfileAwa
         return ClientSessionDataStore.create(ConfigurationProvider.get().getConfiguration(ClientSessionDataConfiguration.class));
     }
 
-    private JaxrsSessionIdProtocol getProtocol(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
+    private JaxrsSessionIdProtocol getProtocol(Specification specification, Registry registry) throws InvalidSpecificationException {
         JaxrsSessionIdProtocol jaxrsSessionIdProtocol;
         if (specification.hasSetting("protocol")) {
             String protocol = Specifications.parseString(specification, "protocol");
-            jaxrsSessionIdProtocol = securityProfile.getRegistry().lookup(protocol, JaxrsSessionIdProtocol.class);
+            jaxrsSessionIdProtocol = registry.lookup(protocol, JaxrsSessionIdProtocol.class);
         } else {
             jaxrsSessionIdProtocol = DEFAULT.getProtocol();
         }
@@ -78,4 +77,5 @@ public final class JaxrsHandshakeConfigurationFactory extends SecurityProfileAwa
     private static JaxrsSessionIdProtocol createDefaultProtocol() throws InvalidSpecificationException, SpecificationNotFoundException, SpecificationFormatException, ConfigurationNotFoundException, IOException {
         return new QuerySessionIdProtocol(ConfigurationProvider.get().getConfiguration(QuerySessionIdConfiguration.class));
     }
+
 }

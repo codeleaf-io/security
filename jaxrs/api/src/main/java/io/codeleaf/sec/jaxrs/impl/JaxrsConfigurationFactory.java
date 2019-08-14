@@ -1,11 +1,11 @@
 package io.codeleaf.sec.jaxrs.impl;
 
+import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.config.spec.InvalidSpecificationException;
 import io.codeleaf.config.spec.Specification;
-import io.codeleaf.sec.impl.SecurityProfileAwareConfigurationFactory;
-import io.codeleaf.sec.profile.SecurityProfile;
+import io.codeleaf.sec.impl.RegistryAwareConfigurationFactory;
 
-public final class JaxrsConfigurationFactory extends SecurityProfileAwareConfigurationFactory<JaxrsConfiguration> {
+public final class JaxrsConfigurationFactory extends RegistryAwareConfigurationFactory<JaxrsConfiguration> {
 
     private final JaxrsHandshakeConfigurationFactory factory = new JaxrsHandshakeConfigurationFactory();
 
@@ -14,8 +14,8 @@ public final class JaxrsConfigurationFactory extends SecurityProfileAwareConfigu
     }
 
     @Override
-    protected JaxrsConfiguration parseConfiguration(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
-        return new JaxrsConfiguration(factory.parseConfiguration(specification, securityProfile));
+    protected JaxrsConfiguration parseConfiguration(Specification specification, Registry registry) throws InvalidSpecificationException {
+        return new JaxrsConfiguration(factory.parseConfiguration(specification, registry));
     }
 
 }

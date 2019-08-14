@@ -13,7 +13,6 @@ public final class QuerySessionIdConfigurationFactory extends AbstractConfigurat
         super(DEFAULT);
     }
 
-
     @Override
     public QuerySessionIdConfiguration parseConfiguration(Specification specification) throws InvalidSpecificationException {
         return new QuerySessionIdConfiguration(

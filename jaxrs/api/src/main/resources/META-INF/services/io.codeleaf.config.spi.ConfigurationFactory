@@ -1,2 +1,5 @@
+io.codeleaf.sec.jaxrs.protocols.query.QuerySessionIdConfigurationFactory
+io.codeleaf.sec.stores.client.ClientSessionDataConfigurationFactory
+io.codeleaf.sec.jaxrs.impl.JaxrsZoneConfigurationFactory
 io.codeleaf.sec.jaxrs.impl.JaxrsHandshakeConfigurationFactory
 io.codeleaf.sec.jaxrs.impl.JaxrsConfigurationFactory

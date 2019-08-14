@@ -1,6 +1,7 @@
 package io.codeleaf.sec.password.dummy;
 
 import io.codeleaf.config.impl.AbstractConfigurationFactory;
+import io.codeleaf.config.spec.InvalidSettingException;
 import io.codeleaf.config.spec.InvalidSpecificationException;
 import io.codeleaf.config.spec.SettingNotFoundException;
 import io.codeleaf.config.spec.Specification;
@@ -26,13 +27,13 @@ public final class DummyConfigurationFactory extends AbstractConfigurationFactor
                 parseRoles(specification));
     }
 
-    private Set<String> parseGroups(Specification specification) throws SettingNotFoundException {
+    private Set<String> parseGroups(Specification specification) throws SettingNotFoundException, InvalidSettingException {
         return specification.hasSetting("groups")
                 ? Specifications.parseSet(specification, "groups")
                 : DEFAULT.getGroups();
     }
 
-    private Set<String> parseRoles(Specification specification) throws SettingNotFoundException {
+    private Set<String> parseRoles(Specification specification) throws SettingNotFoundException, InvalidSettingException {
         return specification.hasSetting("roles")
                 ? Specifications.parseSet(specification, "roles")
                 : DEFAULT.getRoles();

@@ -1,25 +1,25 @@
 package io.codeleaf.sec.jaxrs.authenticators.basic;
 
+import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.config.spec.InvalidSettingException;
 import io.codeleaf.config.spec.InvalidSpecificationException;
 import io.codeleaf.config.spec.SettingNotFoundException;
 import io.codeleaf.config.spec.Specification;
 import io.codeleaf.config.util.Specifications;
-import io.codeleaf.sec.impl.SecurityProfileAwareConfigurationFactory;
+import io.codeleaf.sec.impl.RegistryAwareConfigurationFactory;
 import io.codeleaf.sec.password.spi.PasswordRequestAuthenticator;
-import io.codeleaf.sec.profile.SecurityProfile;
 
-public final class BasicConfigurationFactory extends SecurityProfileAwareConfigurationFactory<BasicConfiguration> {
+public final class BasicConfigurationFactory extends RegistryAwareConfigurationFactory<BasicConfiguration> {
 
     public BasicConfigurationFactory() {
         super(BasicConfiguration.class);
     }
 
     @Override
-    public BasicConfiguration parseConfiguration(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
+    public BasicConfiguration parseConfiguration(Specification specification, Registry registry) throws InvalidSpecificationException {
         try {
             return new BasicConfiguration(
-                    getAuthenticator(specification, securityProfile),
+                    getAuthenticator(specification, registry),
                     getRealm(specification),
                     getPrompt(specification));
         } catch (IllegalArgumentException cause) {
@@ -33,9 +33,9 @@ public final class BasicConfigurationFactory extends SecurityProfileAwareConfigu
                 : "Secured Application";
     }
 
-    private PasswordRequestAuthenticator getAuthenticator(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
+    private PasswordRequestAuthenticator getAuthenticator(Specification specification, Registry registry) throws InvalidSpecificationException {
         String authenticatorName = Specifications.parseString(specification, "passwordAuthenticator");
-        PasswordRequestAuthenticator authenticator = securityProfile.getRegistry().lookup(authenticatorName, PasswordRequestAuthenticator.class);
+        PasswordRequestAuthenticator authenticator = registry.lookup(authenticatorName, PasswordRequestAuthenticator.class);
         if (authenticator == null) {
             throw new InvalidSpecificationException(specification, "No authenticator found with name: " + authenticatorName);
         }
