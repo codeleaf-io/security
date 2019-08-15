@@ -1,5 +1,7 @@
 package io.codeleaf.sec.jaxrs.impl;
 
+import io.codeleaf.sec.jaxrs.config.JaxrsConfiguration;
+import io.codeleaf.sec.jaxrs.config.JaxrsHandshakeConfiguration;
 import io.codeleaf.sec.jaxrs.spi.JaxrsHandshakeState;
 import io.codeleaf.sec.profile.SecurityProfile;
 

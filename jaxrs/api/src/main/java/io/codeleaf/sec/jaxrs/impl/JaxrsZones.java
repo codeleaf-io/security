@@ -1,5 +1,6 @@
 package io.codeleaf.sec.jaxrs.impl;
 
+import io.codeleaf.sec.jaxrs.config.JaxrsZone;
 import io.codeleaf.sec.profile.SecurityProfile;
 import io.codeleaf.sec.profile.SecurityZone;
 

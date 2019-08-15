@@ -1,4 +1,4 @@
-package io.codeleaf.sec.jaxrs.impl;
+package io.codeleaf.sec.jaxrs.config;
 
 import io.codeleaf.config.impl.AbstractConfigurationFactory;
 import io.codeleaf.config.spec.InvalidSettingException;
@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class JaxrsZoneConfigurationFactory extends AbstractConfigurationFactory<JaxrsZone> {
+public final class JaxrsZoneFactory extends AbstractConfigurationFactory<JaxrsZone> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaxrsZoneConfigurationFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JaxrsZoneFactory.class);
 
-    public JaxrsZoneConfigurationFactory() {
+    public JaxrsZoneFactory() {
         super(JaxrsZone.class);
     }
 

@@ -1,4 +1,4 @@
-package io.codeleaf.sec.jaxrs.impl;
+package io.codeleaf.sec.jaxrs.config;
 
 import io.codeleaf.config.Configuration;
 

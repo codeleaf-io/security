@@ -6,6 +6,7 @@ import io.codeleaf.sec.SecurityContext;
 import io.codeleaf.sec.annotation.Authentication;
 import io.codeleaf.sec.annotation.Authentications;
 import io.codeleaf.sec.impl.DefaultSecurityContext;
+import io.codeleaf.sec.jaxrs.config.JaxrsZone;
 import io.codeleaf.sec.jaxrs.spi.Authenticate;
 import io.codeleaf.sec.jaxrs.spi.JaxrsHandshakeState;
 import io.codeleaf.sec.jaxrs.spi.JaxrsRequestAuthenticator;

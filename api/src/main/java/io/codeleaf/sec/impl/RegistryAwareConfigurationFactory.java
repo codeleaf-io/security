@@ -8,7 +8,7 @@ import io.codeleaf.config.impl.ContextAwareConfigurationFactory;
 public abstract class RegistryAwareConfigurationFactory<T extends Configuration> extends ContextAwareConfigurationFactory<T, Registry> {
 
     public RegistryAwareConfigurationFactory(Class<T> configurationTypeClass) {
-        super(configurationTypeClass, Registry.class);
+        super(configurationTypeClass, Registry.class, null, DefaultRegistry::new);
     }
 
     @SuppressWarnings("unchecked")

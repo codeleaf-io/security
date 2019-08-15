@@ -8,6 +8,7 @@ import io.codeleaf.config.spec.InvalidSettingException;
 import io.codeleaf.config.spec.InvalidSpecificationException;
 import io.codeleaf.config.spec.SettingNotFoundException;
 import io.codeleaf.config.spec.Specification;
+import io.codeleaf.config.spec.impl.MapSpecification;
 import io.codeleaf.config.util.Specifications;
 import io.codeleaf.sec.impl.ThreadLocalSecurityContextManager;
 import io.codeleaf.sec.spi.Authenticator;
@@ -48,21 +49,25 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
         try {
             return (SecurityZone) Specifications.parseConfiguration(specification, registry, "zones", zoneName);
         } catch (ClassCastException cause) {
-            throw new InvalidSettingException(specification, specification.getSetting("zones", zoneName), "Is not extending SecurityZone!");
+            throw new InvalidSettingException(specification, specification.getSetting("zones", zoneName), "Zone " + zoneName + " is not extending SecurityZone!", cause);
+        } catch (InvalidSpecificationException cause) {
+            List<String> field = Arrays.asList("zones", zoneName);
+            Specification.Setting setting = new Specification.Setting(field, MapSpecification.create(specification, field));
+            throw new InvalidSettingException(specification, setting, "Invalid security zone " + zoneName + ": " + cause.getMessage(), cause);
         }
     }
 
     private Map<String, Configuration> parseProtocolConfigurations(Specification specification, Registry registry) throws SettingNotFoundException, InvalidSettingException {
         Map<String, Configuration> protocolConfigurations = new LinkedHashMap<>();
         for (String protocolName : specification.getChilds("protocols")) {
-            protocolConfigurations.put(protocolName, Specifications.parseConfiguration(specification, registry, "protocols", protocolName));
+            Configuration configuration = Specifications.parseConfiguration(specification, registry, "protocols", protocolName);
+            protocolConfigurations.put(configuration.getClass().getName(), configuration);
         }
         return protocolConfigurations;
     }
 
     private Map<String, AuthenticatorNode> parseAuthenticatorNodes(Specification specification, Registry registry) throws InvalidSpecificationException {
         Map<String, AuthenticatorNode> authenticatorNodes = new LinkedHashMap<>();
-        System.out.println(specification.getChilds("authenticators"));
         for (String authenticatorName : specification.getChilds("authenticators")) {
             authenticatorNodes.put(authenticatorName, parseAuthenticatorNode(authenticatorName, specification, registry));
         }
@@ -78,7 +83,7 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
             onFailure = null;
         }
         Class<? extends Authenticator> authenticatorClass = Specifications.parseClass(specification, Authenticator.class, "authenticators", authenticatorName, "implementation");
-        Configuration configuration = Specifications.parseConfiguration(specification, "authenticators", authenticatorName, "configuration");
+        Configuration configuration = Specifications.parseConfiguration(specification, registry, "authenticators", authenticatorName, "configuration");
         Authenticator authenticator = createAuthenticator(specification, authenticatorName, authenticatorClass, configuration, registry);
         registry.register(authenticatorName, authenticator);
         return new AuthenticatorNode(authenticatorName, authenticator, onFailure);
