@@ -1,6 +1,6 @@
 package io.codeleaf.sec.jaxrs.config;
 
-import io.codeleaf.config.impl.AbstractConfigurationFactory;
+import io.codeleaf.config.impl.ContextAwareConfigurationFactory;
 import io.codeleaf.config.spec.InvalidSettingException;
 import io.codeleaf.config.spec.InvalidSpecificationException;
 import io.codeleaf.config.spec.SettingNotFoundException;
@@ -14,17 +14,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class JaxrsZoneFactory extends AbstractConfigurationFactory<JaxrsZone> {
+public final class JaxrsZoneFactory extends ContextAwareConfigurationFactory<JaxrsZone, String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JaxrsZoneFactory.class);
 
     public JaxrsZoneFactory() {
-        super(JaxrsZone.class);
+        super(JaxrsZone.class, String.class);
     }
 
     @Override
-    protected JaxrsZone parseConfiguration(Specification specification) throws InvalidSpecificationException {
-        String zoneName = Specifications.parseString(specification, "name");
+    protected JaxrsZone parseConfiguration(Specification specification, String zoneName) throws InvalidSpecificationException {
         LOGGER.debug("Parsing zone: " + zoneName + "...");
         AuthenticationPolicy policy = parsePolicy(specification, specification.getSetting("policy"));
         String authenticatorName = specification.hasSetting("authenticator")
@@ -34,7 +33,7 @@ public final class JaxrsZoneFactory extends AbstractConfigurationFactory<JaxrsZo
             throw new SettingNotFoundException(specification, Collections.singletonList("authenticator"));
         }
         List<String> endpoints = parseEndpoints(specification, specification.getSetting("endpoints"));
-        return new JaxrsZone(zoneName, policy, endpoints, authenticatorName);
+        return new JaxrsZone(zoneName, policy, endpoints, authenticatorName, Collections.emptySet());
     }
 
     private AuthenticationPolicy parsePolicy(Specification specification, Specification.Setting setting) throws InvalidSettingException {

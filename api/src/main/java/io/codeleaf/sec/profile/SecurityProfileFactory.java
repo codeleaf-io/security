@@ -32,22 +32,22 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
         Registry registry = new DefaultRegistry();
         Map<String, AuthenticatorNode> authenticatorNodes = parseAuthenticatorNodes(specification, registry);
         Map<String, Configuration> protocolConfigurations = parseProtocolConfigurations(specification, registry);
-        List<SecurityZone> securityZones = parseSecurityZones(specification, registry);
+        List<SecurityZone> securityZones = parseSecurityZones(specification);
         SecurityContextManager securityContextManager = new ThreadLocalSecurityContextManager();
         return new SecurityProfile(registry, authenticatorNodes, protocolConfigurations, securityZones, securityContextManager);
     }
 
-    private List<SecurityZone> parseSecurityZones(Specification specification, Registry registry) throws SettingNotFoundException, InvalidSettingException {
+    private List<SecurityZone> parseSecurityZones(Specification specification) throws SettingNotFoundException, InvalidSettingException {
         List<SecurityZone> securityZones = new ArrayList<>();
         for (String zoneName : specification.getChilds("zones")) {
-            securityZones.add(parseSecurityZone(specification, zoneName, registry));
+            securityZones.add(parseSecurityZone(specification, zoneName));
         }
         return securityZones;
     }
 
-    private SecurityZone parseSecurityZone(Specification specification, String zoneName, Registry registry) throws SettingNotFoundException, InvalidSettingException {
+    private SecurityZone parseSecurityZone(Specification specification, String zoneName) throws SettingNotFoundException, InvalidSettingException {
         try {
-            return (SecurityZone) Specifications.parseConfiguration(specification, registry, "zones", zoneName);
+            return (SecurityZone) Specifications.parseConfiguration(specification, zoneName, Arrays.asList("zones", zoneName));
         } catch (ClassCastException cause) {
             throw new InvalidSettingException(specification, specification.getSetting("zones", zoneName), "Zone " + zoneName + " is not extending SecurityZone!", cause);
         } catch (InvalidSpecificationException cause) {
