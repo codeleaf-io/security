@@ -10,9 +10,7 @@ import io.codeleaf.sec.profile.AuthenticationPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class JaxrsZoneFactory extends ContextAwareConfigurationFactory<JaxrsZone, String> {
 
@@ -33,7 +31,29 @@ public final class JaxrsZoneFactory extends ContextAwareConfigurationFactory<Jax
             throw new SettingNotFoundException(specification, Collections.singletonList("authenticator"));
         }
         List<String> endpoints = parseEndpoints(specification, specification.getSetting("endpoints"));
-        return new JaxrsZone(zoneName, policy, endpoints, authenticatorName, Collections.emptySet());
+        Set<String> authenticatorProviders = specification.hasSetting("authorizationProviders")
+                ? parseAuthenticatorProviders(specification, specification.getSetting("authorizationProviders"))
+                : Collections.emptySet();
+        return new JaxrsZone(zoneName, policy, endpoints, authenticatorName, authenticatorProviders);
+    }
+
+    private Set<String> parseAuthenticatorProviders(Specification specification, Specification.Setting setting) throws InvalidSettingException {
+        Set<String> providers;
+        if (setting.getValue() instanceof String) {
+            providers = Collections.singleton((String) setting.getValue());
+        } else if (setting.getValue() instanceof List) {
+            providers = new LinkedHashSet<>();
+            for (Object item : ((List<?>) setting.getValue())) {
+                if (!(item instanceof String)) {
+                    throw new InvalidSettingException(specification, setting, "AutorizationProviders must only contain Strings!");
+                } else {
+                    providers.add((String) item);
+                }
+            }
+        } else {
+            throw new InvalidSettingException(specification, setting, "AutorizationProviders must be a String or list of Strings!");
+        }
+        return providers;
     }
 
     private AuthenticationPolicy parsePolicy(Specification specification, Specification.Setting setting) throws InvalidSettingException {

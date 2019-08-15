@@ -140,10 +140,10 @@ public final class JaxrsZoneHandler {
 
         private void handleAuthorizations(JaxrsZone zone, SecurityContext securityContext) throws SecurityException {
             for (String loaderName : zone.getAuthorizationLoaders()) {
-                AuthorizationLoader loader = securityProfile.getRegistry().lookup(loaderName, AuthorizationLoader.class);
-                if (loader == null) {
+                if (!securityProfile.getRegistry().contains(loaderName, AuthorizationLoader.class)) {
                     throw new SecurityException("No authorization loader found with name: " + loaderName);
                 }
+                AuthorizationLoader loader = securityProfile.getRegistry().lookup(loaderName, AuthorizationLoader.class);
                 securityContext.getAuthorizations().addAll(loader.loadAuthorizations(securityContext.getAuthentication()));
             }
         }
