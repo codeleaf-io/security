@@ -6,6 +6,7 @@ import io.codeleaf.sec.SecurityContext;
 import io.codeleaf.sec.annotation.Authentication;
 import io.codeleaf.sec.annotation.Authentications;
 import io.codeleaf.sec.impl.DefaultSecurityContext;
+import io.codeleaf.sec.impl.ThreadLocalSecurityProfileManager;
 import io.codeleaf.sec.jaxrs.config.JaxrsZone;
 import io.codeleaf.sec.jaxrs.spi.Authenticate;
 import io.codeleaf.sec.jaxrs.spi.JaxrsHandshakeState;
@@ -55,6 +56,7 @@ public final class JaxrsZoneHandler {
 
         @Override
         public void filter(ContainerRequestContext requestContext) {
+            ThreadLocalSecurityProfileManager.setSecurityProfile(securityProfile);
             URI requestUri = requestContext.getUriInfo().getRequestUri();
             LOGGER.debug("Processing request for endpoint: " + requestContext.getMethod() + " " + requestUri);
             JaxrsHandshakeSessionManager.get().setRequestContext(requestContext);

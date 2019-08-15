@@ -3,6 +3,7 @@ package io.codeleaf.sec.jaxrs.config;
 import io.codeleaf.sec.profile.AuthenticationPolicy;
 import io.codeleaf.sec.profile.SecurityZone;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +38,7 @@ public final class JaxrsZone implements SecurityZone {
 
     @Override
     public Set<String> getAuthorizationLoaders() {
-        return null;
+        return Collections.emptySet();
     }
 
     public List<String> getEndpoints() {
