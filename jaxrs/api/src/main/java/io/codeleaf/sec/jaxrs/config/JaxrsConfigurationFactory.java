@@ -7,10 +7,12 @@ import io.codeleaf.sec.impl.RegistryAwareConfigurationFactory;
 
 public final class JaxrsConfigurationFactory extends RegistryAwareConfigurationFactory<JaxrsConfiguration> {
 
+    private static final JaxrsConfiguration DEFAULT = new JaxrsConfiguration(JaxrsHandshakeConfigurationFactory.DEFAULT);
+
     private final JaxrsHandshakeConfigurationFactory factory = new JaxrsHandshakeConfigurationFactory();
 
     public JaxrsConfigurationFactory() {
-        super(JaxrsConfiguration.class);
+        super(DEFAULT);
     }
 
     @Override

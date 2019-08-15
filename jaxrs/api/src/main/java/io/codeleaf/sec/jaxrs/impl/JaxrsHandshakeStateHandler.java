@@ -1,5 +1,6 @@
 package io.codeleaf.sec.jaxrs.impl;
 
+import io.codeleaf.config.ConfigurationException;
 import io.codeleaf.sec.jaxrs.config.JaxrsConfiguration;
 import io.codeleaf.sec.jaxrs.config.JaxrsHandshakeConfiguration;
 import io.codeleaf.sec.jaxrs.spi.JaxrsHandshakeState;
@@ -9,6 +10,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Objects;
@@ -85,7 +87,7 @@ public final class JaxrsHandshakeStateHandler {
         return segments.get(1).getPath();
     }
 
-    public static JaxrsHandshakeStateHandler create(SecurityProfile securityProfile) {
+    public static JaxrsHandshakeStateHandler create(SecurityProfile securityProfile) throws IOException, ConfigurationException {
         return new JaxrsHandshakeStateHandler(securityProfile.getProtocolConfiguration(JaxrsConfiguration.class).getHandshakeConfiguration());
     }
 }

@@ -4,10 +4,13 @@ import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.common.utils.Registries;
 import io.codeleaf.common.utils.SingletonServiceLoader;
 import io.codeleaf.config.Configuration;
+import io.codeleaf.config.ConfigurationException;
+import io.codeleaf.config.ConfigurationProvider;
 import io.codeleaf.sec.spi.SecurityContextManager;
 import io.codeleaf.sec.spi.SecurityContextProvider;
 import io.codeleaf.sec.spi.SecurityProfileProvider;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +40,10 @@ public final class SecurityProfile implements Configuration {
     }
 
     @SuppressWarnings("unchecked")
-    public <C extends Configuration> C getProtocolConfiguration(Class<C> protocolConfigurationType) {
+    public <C extends Configuration> C getProtocolConfiguration(Class<C> protocolConfigurationType) throws ConfigurationException, IOException {
+        if (!protocolConfigurations.containsKey(protocolConfigurationType.getName())) {
+            protocolConfigurations.put(protocolConfigurationType.getName(), ConfigurationProvider.get().getConfiguration(protocolConfigurationType, registry));
+        }
         return (C) protocolConfigurations.get(protocolConfigurationType.getName());
     }
 

@@ -17,11 +17,11 @@ import java.io.IOException;
 
 public final class JaxrsHandshakeConfigurationFactory extends RegistryAwareConfigurationFactory<JaxrsHandshakeConfiguration> {
 
-    private static final JaxrsHandshakeConfiguration DEFAULT = createDefault();
+    protected static final JaxrsHandshakeConfiguration DEFAULT;
 
-    static JaxrsHandshakeConfiguration createDefault() {
+    static {
         try {
-            return new JaxrsHandshakeConfiguration("/authn", createDefaultProtocol(), createDefaultStore());
+            DEFAULT = new JaxrsHandshakeConfiguration("/authn", createDefaultProtocol(), createDefaultStore());
         } catch (Throwable cause) {
             throw new ExceptionInInitializerError(cause);
         }
