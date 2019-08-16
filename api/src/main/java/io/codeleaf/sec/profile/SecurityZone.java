@@ -1,6 +1,7 @@
 package io.codeleaf.sec.profile;
 
 import io.codeleaf.config.Configuration;
+import io.codeleaf.sec.Permissions;
 
 import java.util.Set;
 
@@ -8,10 +9,14 @@ public interface SecurityZone extends Configuration {
 
     String getName();
 
+    AuthenticationPolicy getAuthenticationPolicy();
+
     String getAuthenticatorName();
 
-    Set<String> getAuthorizationLoaders();
+    Set<String> getAuthorizationLoaderNames();
 
-    AuthenticationPolicy getAuthenticationPolicy();
+    String getAuthorizerName();
+
+    Set<Permissions> getPermissions();
 
 }

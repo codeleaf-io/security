@@ -3,6 +3,7 @@ package io.codeleaf.sec.impl;
 import io.codeleaf.sec.profile.SecurityProfile;
 import io.codeleaf.sec.spi.SecurityProfileProvider;
 
+// TODO: expose through interface, after Service Identity is supported
 public final class ThreadLocalSecurityProfileManager implements SecurityProfileProvider {
 
     private static final ThreadLocal<SecurityProfile> securityProfileThreadLocal = new ThreadLocal<>();

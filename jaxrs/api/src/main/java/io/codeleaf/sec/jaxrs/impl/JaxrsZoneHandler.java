@@ -2,6 +2,7 @@ package io.codeleaf.sec.jaxrs.impl;
 
 import io.codeleaf.common.utils.Methods;
 import io.codeleaf.common.utils.Types;
+import io.codeleaf.sec.Permissions;
 import io.codeleaf.sec.SecurityContext;
 import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.annotation.Authentication;
@@ -15,6 +16,7 @@ import io.codeleaf.sec.jaxrs.spi.JaxrsRequestAuthenticator;
 import io.codeleaf.sec.profile.AuthenticationPolicy;
 import io.codeleaf.sec.profile.SecurityProfile;
 import io.codeleaf.sec.spi.AuthorizationLoader;
+import io.codeleaf.sec.spi.Authorizer;
 import io.codeleaf.sec.spi.SecurityContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,9 +122,14 @@ public final class JaxrsZoneHandler {
                     SecurityContext securityContext = handleAuthentication(requestContext, policy);
                     if (securityContext != null) {
                         handleAuthorizations(zone, securityContext);
+                        if (!isAuthorized(zone, securityContext)) {
+                            LOGGER.error("Authorizer returned false!");
+                            setTrue(requestContext, "aborted");
+                            requestContext.abortWith(UNAUTHORIZED);
+                        }
                     }
                 }
-                if (isTrue(requestContext, "handshakeResource")) {
+                if (!isTrue(requestContext, "aborted") && isTrue(requestContext, "handshakeResource")) {
                     setExecutors(requestContext, state.getFirstAuthenticatorName());
                     JaxrsHandshakeSessionManager.get().setExecutor(getCurrentExecutor(requestContext));
                 }
@@ -139,8 +146,27 @@ public final class JaxrsZoneHandler {
             }
         }
 
+        @SuppressWarnings("unchecked")
+        private boolean isAuthorized(JaxrsZone zone, SecurityContext securityContext) throws SecurityException {
+            if (zone.getAuthorizerName() != null) {
+                if (securityProfile.getRegistry().lookup(zone.getAuthorizerName(), Authorizer.class) == null) {
+                    throw new SecurityException("No authorizer present with name: " + zone.getAuthorizerName());
+                }
+                Authorizer authorizer = securityProfile.getRegistry().lookup(zone.getAuthorizerName(), Authorizer.class);
+                for (Permissions permissions : zone.getPermissions()) {
+                    if (authorizer.getPermissionsType().isAssignableFrom(permissions.getClass())) {
+                        if (authorizer.isAuthorized(permissions, securityContext.getAuthorizations())) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            return true;
+        }
+
         private void handleAuthorizations(JaxrsZone zone, SecurityContext securityContext) throws SecurityException {
-            for (String loaderName : zone.getAuthorizationLoaders()) {
+            for (String loaderName : zone.getAuthorizationLoaderNames()) {
                 if (!securityProfile.getRegistry().contains(loaderName, AuthorizationLoader.class)) {
                     throw new SecurityException("No authorization loader found with name: " + loaderName);
                 }

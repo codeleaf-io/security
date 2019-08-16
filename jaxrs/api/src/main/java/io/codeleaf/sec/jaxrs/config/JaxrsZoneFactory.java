@@ -1,80 +1,25 @@
 package io.codeleaf.sec.jaxrs.config;
 
-import io.codeleaf.config.impl.ContextAwareConfigurationFactory;
 import io.codeleaf.config.spec.InvalidSettingException;
 import io.codeleaf.config.spec.InvalidSpecificationException;
-import io.codeleaf.config.spec.SettingNotFoundException;
 import io.codeleaf.config.spec.Specification;
-import io.codeleaf.config.util.Specifications;
-import io.codeleaf.sec.profile.AuthenticationPolicy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.codeleaf.sec.impl.AbstractZoneFactory;
+import io.codeleaf.sec.profile.SecurityZone;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public final class JaxrsZoneFactory extends ContextAwareConfigurationFactory<JaxrsZone, String> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaxrsZoneFactory.class);
+public final class JaxrsZoneFactory extends AbstractZoneFactory<JaxrsZone> {
 
     public JaxrsZoneFactory() {
-        super(JaxrsZone.class, String.class);
+        super(JaxrsZone.class);
     }
 
     @Override
-    protected JaxrsZone parseConfiguration(Specification specification, String zoneName) throws InvalidSpecificationException {
-        LOGGER.debug("Parsing zone: " + zoneName + "...");
-        AuthenticationPolicy policy = parsePolicy(specification, specification.getSetting("policy"));
-        String authenticatorName = specification.hasSetting("authenticator")
-                ? Specifications.parseString(specification, "authenticator")
-                : null;
-        if (policy == AuthenticationPolicy.REQUIRED && authenticatorName == null) {
-            throw new SettingNotFoundException(specification, Collections.singletonList("authenticator"));
-        }
+    protected JaxrsZone doParseConfiguration(Specification specification, SecurityZone securityZone) throws InvalidSpecificationException {
         List<String> endpoints = parseEndpoints(specification, specification.getSetting("endpoints"));
-        Set<String> authenticatorProviders = specification.hasSetting("authorizationProviders")
-                ? parseAuthenticatorProviders(specification, specification.getSetting("authorizationProviders"))
-                : Collections.emptySet();
-        return new JaxrsZone(zoneName, policy, endpoints, authenticatorName, authenticatorProviders);
-    }
-
-    private Set<String> parseAuthenticatorProviders(Specification specification, Specification.Setting setting) throws InvalidSettingException {
-        Set<String> providers;
-        if (setting.getValue() instanceof String) {
-            providers = Collections.singleton((String) setting.getValue());
-        } else if (setting.getValue() instanceof List) {
-            providers = new LinkedHashSet<>();
-            for (Object item : ((List<?>) setting.getValue())) {
-                if (!(item instanceof String)) {
-                    throw new InvalidSettingException(specification, setting, "AutorizationProviders must only contain Strings!");
-                } else {
-                    providers.add((String) item);
-                }
-            }
-        } else {
-            throw new InvalidSettingException(specification, setting, "AutorizationProviders must be a String or list of Strings!");
-        }
-        return providers;
-    }
-
-    private AuthenticationPolicy parsePolicy(Specification specification, Specification.Setting setting) throws InvalidSettingException {
-        if (!(setting.getValue() instanceof String)) {
-            throw new InvalidSettingException(specification, setting, "policy must be a String!");
-        }
-        AuthenticationPolicy policy;
-        switch ((String) setting.getValue()) {
-            case "none":
-                policy = AuthenticationPolicy.NONE;
-                break;
-            case "optional":
-                policy = AuthenticationPolicy.OPTIONAL;
-                break;
-            case "required":
-                policy = AuthenticationPolicy.REQUIRED;
-                break;
-            default:
-                throw new InvalidSettingException(specification, setting, "Invalid policy value, must be: none, optional, redirect or required!");
-        }
-        return policy;
+        return new JaxrsZone(securityZone, endpoints);
     }
 
     private List<String> parseEndpoints(Specification specification, Specification.Setting setting) throws InvalidSettingException {

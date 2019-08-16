@@ -1,1 +1,2 @@
+io.codeleaf.sec.impl.DefaultSecurityZoneFactory
 io.codeleaf.sec.profile.SecurityProfileFactory

@@ -13,6 +13,7 @@ import io.codeleaf.config.util.Specifications;
 import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.impl.ThreadLocalSecurityContextManager;
 import io.codeleaf.sec.spi.SecurityContextManager;
+import io.codeleaf.sec.spi.SecurityProfileAware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
     private void initRegistryObjects(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
         try {
             for (String name : securityProfile.getRegistry().getNames(SecurityProfileAware.class)) {
-                securityProfile.getRegistry().lookup(name, SecurityProfileAware.class).setSecurityProfile(securityProfile);
+                securityProfile.getRegistry().lookup(name, SecurityProfileAware.class).init(securityProfile);
             }
         } catch (SecurityException cause) {
             throw new InvalidSpecificationException(specification, "Failed to initialize objects: " + cause.getMessage(), cause);
