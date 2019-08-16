@@ -1,6 +1,7 @@
 package io.codeleaf.sec.jaxrs.spi;
 
 import io.codeleaf.sec.Authentication;
+import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.spi.Authenticator;
 
 import javax.ws.rs.container.ContainerRequestContext;

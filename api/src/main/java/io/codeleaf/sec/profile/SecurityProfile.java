@@ -18,14 +18,14 @@ import java.util.Map;
 public final class SecurityProfile implements Configuration {
 
     private final Registry registry;
-    private final Map<String, AuthenticatorNode> authenticatorNodes;
+    private final Map<String, String> authenticatorChain;
     private final Map<String, Configuration> protocolConfigurations;
     private final List<SecurityZone> securityZones;
     private final SecurityContextManager securityContextManager;
 
-    public SecurityProfile(Registry registry, Map<String, AuthenticatorNode> authenticatorNodes, Map<String, Configuration> protocolConfigurations, List<SecurityZone> securityZones, SecurityContextManager securityContextManager) {
+    public SecurityProfile(Registry registry, Map<String, String> authenticatorChain, Map<String, Configuration> protocolConfigurations, List<SecurityZone> securityZones, SecurityContextManager securityContextManager) {
         this.registry = registry;
-        this.authenticatorNodes = authenticatorNodes;
+        this.authenticatorChain = authenticatorChain;
         this.protocolConfigurations = protocolConfigurations;
         this.securityZones = securityZones;
         this.securityContextManager = securityContextManager;
@@ -35,8 +35,8 @@ public final class SecurityProfile implements Configuration {
         return registry;
     }
 
-    public Map<String, AuthenticatorNode> getAuthenticatorNodes() {
-        return authenticatorNodes;
+    public Map<String, String> getAuthenticatorChain() {
+        return authenticatorChain;
     }
 
     @SuppressWarnings("unchecked")

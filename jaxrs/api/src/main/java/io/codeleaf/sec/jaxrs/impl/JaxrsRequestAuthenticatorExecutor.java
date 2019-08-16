@@ -1,6 +1,7 @@
 package io.codeleaf.sec.jaxrs.impl;
 
 import io.codeleaf.sec.Authentication;
+import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.jaxrs.spi.JaxrsHandshakeState;
 import io.codeleaf.sec.jaxrs.spi.JaxrsRequestAuthenticator;
 import org.slf4j.Logger;

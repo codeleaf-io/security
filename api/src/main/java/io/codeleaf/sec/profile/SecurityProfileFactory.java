@@ -10,8 +10,8 @@ import io.codeleaf.config.spec.SettingNotFoundException;
 import io.codeleaf.config.spec.Specification;
 import io.codeleaf.config.spec.impl.MapSpecification;
 import io.codeleaf.config.util.Specifications;
+import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.impl.ThreadLocalSecurityContextManager;
-import io.codeleaf.sec.spi.Authenticator;
 import io.codeleaf.sec.spi.SecurityContextManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +30,33 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
     @Override
     protected SecurityProfile parseConfiguration(Specification specification) throws InvalidSpecificationException {
         Registry registry = new DefaultRegistry();
-        Map<String, AuthenticatorNode> authenticatorNodes = parseAuthenticatorNodes(specification, registry);
+        parseRegistryObjects(specification, registry);
+        Map<String, String> authenticatorChain = parseAuthenticatorChain(specification, registry);
         Map<String, Configuration> protocolConfigurations = parseProtocolConfigurations(specification, registry);
         List<SecurityZone> securityZones = parseSecurityZones(specification);
         SecurityContextManager securityContextManager = new ThreadLocalSecurityContextManager();
-        return new SecurityProfile(registry, authenticatorNodes, protocolConfigurations, securityZones, securityContextManager);
+        SecurityProfile securityProfile = new SecurityProfile(registry, authenticatorChain, protocolConfigurations, securityZones, securityContextManager);
+        initRegistryObjects(specification, securityProfile);
+        return securityProfile;
+    }
+
+    private void initRegistryObjects(Specification specification, SecurityProfile securityProfile) throws InvalidSpecificationException {
+        try {
+            for (String name : securityProfile.getRegistry().getNames(SecurityProfileAware.class)) {
+                securityProfile.getRegistry().lookup(name, SecurityProfileAware.class).setSecurityProfile(securityProfile);
+            }
+        } catch (SecurityException cause) {
+            throw new InvalidSpecificationException(specification, "Failed to initialize objects: " + cause.getMessage(), cause);
+        }
+    }
+
+    private void parseRegistryObjects(Specification specification, Registry registry) throws InvalidSpecificationException {
+        for (String objectName : specification.getChilds("registry")) {
+            Class<?> objectType = Specifications.parseClass(specification, "registry", objectName, "type");
+            Configuration configuration = Specifications.parseConfiguration(specification, registry, "registry", objectName, "configuration");
+            Object object = createObject(specification, objectName, objectType, configuration, registry);
+            registry.register(objectName, object);
+        }
     }
 
     private List<SecurityZone> parseSecurityZones(Specification specification) throws SettingNotFoundException, InvalidSettingException {
@@ -66,27 +88,12 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
         return protocolConfigurations;
     }
 
-    private Map<String, AuthenticatorNode> parseAuthenticatorNodes(Specification specification, Registry registry) throws InvalidSpecificationException {
-        Map<String, AuthenticatorNode> authenticatorNodes = new LinkedHashMap<>();
-        for (String authenticatorName : specification.getChilds("authenticators")) {
-            authenticatorNodes.put(authenticatorName, parseAuthenticatorNode(authenticatorName, specification, registry));
+    private Map<String, String> parseAuthenticatorChain(Specification specification, Registry registry) throws InvalidSpecificationException {
+        Map<String, String> authenticatorChain = new LinkedHashMap<>();
+        for (String authenticatorName : specification.getChilds("authenticatorChain")) {
+            authenticatorChain.put(authenticatorName, Specifications.parseString(specification, "authenticatorChain", authenticatorName));
         }
-        return authenticatorNodes;
-    }
-
-    private AuthenticatorNode parseAuthenticatorNode(String authenticatorName, Specification specification, Registry registry) throws InvalidSpecificationException {
-        LOGGER.debug("Parsing authenticator: " + authenticatorName + "...");
-        String onFailure;
-        if (specification.hasSetting("authenticators", authenticatorName, "onFailure")) {
-            onFailure = Specifications.parseString(specification, "authenticators", authenticatorName, "onFailure");
-        } else {
-            onFailure = null;
-        }
-        Class<? extends Authenticator> authenticatorClass = Specifications.parseClass(specification, Authenticator.class, "authenticators", authenticatorName, "implementation");
-        Configuration configuration = Specifications.parseConfiguration(specification, registry, "authenticators", authenticatorName, "configuration");
-        Authenticator authenticator = createAuthenticator(specification, authenticatorName, authenticatorClass, configuration, registry);
-        registry.register(authenticatorName, authenticator);
-        return new AuthenticatorNode(authenticatorName, authenticator, onFailure);
+        return authenticatorChain;
     }
 
     /*
@@ -95,43 +102,37 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
      * When none found, for a constructor(configuration),
      * otherwise error.
      */
-    private Authenticator createAuthenticator(Specification specification, String authenticatorName, Class<? extends Authenticator> authenticatorClass, Configuration configuration, Registry registry) throws InvalidSpecificationException {
+    private Object createObject(Specification specification, String objectName, Class<?> objectTypeClass, Configuration configuration, Registry registry) throws InvalidSpecificationException {
         try {
-            LOGGER.debug("Initializing authenticator: " + authenticatorName);
+            LOGGER.debug("Initializing object: " + objectName);
             Class<? extends Configuration> configurationClass = configuration.getClass();
-            Method createConfigRegistryMethod = getPublicStaticCreateMethodOrNull(authenticatorClass, new Class<?>[]{configurationClass, Registry.class});
+            Method createConfigRegistryMethod = getPublicStaticCreateMethodOrNull(objectTypeClass, new Class<?>[]{configurationClass, Registry.class});
             Object instance = null;
             if (createConfigRegistryMethod != null) {
                 instance = createConfigRegistryMethod.invoke(null, configuration, registry);
             } else {
-                Method createConfigMethod = getPublicStaticCreateMethodOrNull(authenticatorClass, new Class<?>[]{configurationClass});
+                Method createConfigMethod = getPublicStaticCreateMethodOrNull(objectTypeClass, new Class<?>[]{configurationClass});
                 if (createConfigMethod != null) {
                     instance = createConfigMethod.invoke(null, configuration);
                 } else {
-                    Constructor<?> constructor = getConstructor(authenticatorClass, configurationClass);
+                    Constructor<?> constructor = getConstructor(objectTypeClass, configurationClass);
                     if (constructor != null) {
                         instance = constructor.newInstance(configuration);
                     }
                 }
             }
             if (instance == null) {
-                throw new IllegalStateException("No proper create method or constructor found for instantiation of: " + authenticatorName);
+                throw new IllegalStateException("No proper create method or constructor found for instantiation of: " + objectName);
             }
-//            else {
-            // TODO: handle this in JAXRS - or maybe have a SecurityProfile init...
-//                if (instance instanceof JaxrsHandshakeSession.SessionAware) {
-//                    ((HandshakeSession.SessionAware) instance).init(HandshakeSessionManager.get());
-//                }
-//            }
-            return (Authenticator) instance;
+            return instance;
         } catch (IllegalAccessException | IllegalStateException | InvocationTargetException | InstantiationException cause) {
-            LOGGER.error("Failed to initialize authenticator: " + cause.getMessage());
+            LOGGER.error("Failed to initialize object: " + cause.getMessage());
             throw new InvalidSpecificationException(specification, cause.getMessage(), cause);
         }
     }
 
-    private Method getPublicStaticCreateMethodOrNull(Class<? extends Authenticator> authenticatorClass, Class<?>[] parameterTypes) {
-        for (Method method : authenticatorClass.getMethods()) {
+    private Method getPublicStaticCreateMethodOrNull(Class<?> objectTypeClass, Class<?>[] parameterTypes) {
+        for (Method method : objectTypeClass.getMethods()) {
             if (method.getName().equals("create")) {
                 if (Arrays.equals(method.getParameterTypes(), parameterTypes)) {
                     if (Modifier.isStatic(method.getModifiers()) && Modifier.isPublic(method.getModifiers())) {
@@ -143,8 +144,8 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
         return null;
     }
 
-    private Constructor<?> getConstructor(Class<? extends Authenticator> authenticatorClass, Class<? extends Configuration> configurationClass) {
-        for (Constructor<?> constructor : authenticatorClass.getConstructors()) {
+    private Constructor<?> getConstructor(Class<?> objectTypeClass, Class<? extends Configuration> configurationClass) {
+        for (Constructor<?> constructor : objectTypeClass.getConstructors()) {
             Type[] parameterTypes = constructor.getGenericParameterTypes();
             for (Type type : parameterTypes) {
                 if (type.equals(configurationClass)) {

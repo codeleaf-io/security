@@ -3,6 +3,7 @@ package io.codeleaf.sec.jaxrs.impl;
 import io.codeleaf.common.utils.Methods;
 import io.codeleaf.common.utils.Types;
 import io.codeleaf.sec.SecurityContext;
+import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.annotation.Authentication;
 import io.codeleaf.sec.annotation.Authentications;
 import io.codeleaf.sec.impl.DefaultSecurityContext;
@@ -170,15 +171,18 @@ public final class JaxrsZoneHandler {
         }
     }
 
-    private void setExecutors(ContainerRequestContext requestContext, String authenticatorName) {
+    private void setExecutors(ContainerRequestContext requestContext, String authenticatorName) throws SecurityException {
         JaxrsRequestAuthenticatorExecutor root = new RootRequestAuthenticatorExecutor(securityContextManager, handshakeStateHandler);
         JaxrsRequestAuthenticatorExecutor current = root;
         Map<String, JaxrsRequestAuthenticatorExecutor> executorIndex = new HashMap<>();
         while (authenticatorName != null) {
+            if (!securityProfile.getRegistry().contains(authenticatorName, JaxrsRequestAuthenticator.class)) {
+                throw new SecurityException("Incorrect type of authentication link chain: " + authenticatorName + " is not of type " + JaxrsRequestAuthenticator.class.getName());
+            }
             current.setOnFailure(authenticatorName, securityProfile.getRegistry().lookup(authenticatorName, JaxrsRequestAuthenticator.class));
             current = current.getOnFailure();
             executorIndex.put(authenticatorName, current);
-            authenticatorName = securityProfile.getAuthenticatorNodes().get(authenticatorName).getOnFailure();
+            authenticatorName = securityProfile.getAuthenticatorChain().get(authenticatorName);
         }
         requestContext.setProperty("executorRoot", root);
         requestContext.setProperty("executorIndex", executorIndex);
