@@ -17,6 +17,8 @@
 
     <modules>
         <module>api</module>
+        <module>authorizers/roles</module>
+        <module>authorizers/groups</module>
         <module>stores/client</module>
         <module>stores/local</module>
         <module>password/spi</module>
@@ -46,6 +48,16 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sec-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-authorizer-roles</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-authorizer-groups</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

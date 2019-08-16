@@ -1,0 +1,23 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.codeleaf.sec</groupId>
+        <artifactId>security</artifactId>
+        <version>0.1.0</version>
+        <relativePath>../..</relativePath>
+    </parent>
+
+    <artifactId>sec-authorizer-roles</artifactId>
+
+    <name>Security :: Authorizer :: Roles</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-api</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

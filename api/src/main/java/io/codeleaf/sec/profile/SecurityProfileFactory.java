@@ -53,8 +53,13 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
     private void parseRegistryObjects(Specification specification, Registry registry) throws InvalidSpecificationException {
         for (String objectName : specification.getChilds("registry")) {
             Class<?> objectType = Specifications.parseClass(specification, "registry", objectName, "type");
-            Configuration configuration = Specifications.parseConfiguration(specification, registry, "registry", objectName, "configuration");
-            Object object = createObject(specification, objectName, objectType, configuration, registry);
+            Object object;
+            if (!specification.getChilds("registry", objectName, "configuration").isEmpty()) {
+                Configuration configuration = Specifications.parseConfiguration(specification, registry, "registry", objectName, "configuration");
+                object = createObject(specification, objectName, objectType, configuration, registry);
+            } else {
+                object = createObject(specification, objectName, objectType);
+            }
             registry.register(objectName, object);
         }
     }
@@ -94,6 +99,16 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
             authenticatorChain.put(authenticatorName, Specifications.parseString(specification, "authenticatorChain", authenticatorName));
         }
         return authenticatorChain;
+    }
+
+    private Object createObject(Specification specification, String objectName, Class<?> objectTypeClass) throws InvalidSpecificationException {
+        try {
+            LOGGER.debug("Instantiating object: " + objectName);
+            return objectTypeClass.getConstructor().newInstance();
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException cause) {
+            LOGGER.error("Failed to instantiate object: " + cause.getMessage());
+            throw new InvalidSpecificationException(specification, cause.getMessage(), cause);
+        }
     }
 
     /*

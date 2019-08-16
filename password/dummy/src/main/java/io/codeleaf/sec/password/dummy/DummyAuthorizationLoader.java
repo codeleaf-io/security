@@ -4,8 +4,9 @@ import io.codeleaf.config.ConfigurationException;
 import io.codeleaf.config.ConfigurationProvider;
 import io.codeleaf.sec.Authentication;
 import io.codeleaf.sec.Authorization;
+import io.codeleaf.sec.authorizers.groups.DefaultGroupsAuthorization;
+import io.codeleaf.sec.authorizers.roles.DefaultRolesAuthorization;
 import io.codeleaf.sec.impl.DefaultAuthentication;
-import io.codeleaf.sec.impl.DefaultGroupsAndRolesAuthorization;
 import io.codeleaf.sec.password.spi.Credentials;
 import io.codeleaf.sec.password.spi.PasswordRequestAuthenticator;
 import io.codeleaf.sec.spi.AuthorizationLoader;
@@ -13,8 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 public final class DummyAuthorizationLoader implements PasswordRequestAuthenticator, AuthorizationLoader {
 
@@ -57,7 +57,13 @@ public final class DummyAuthorizationLoader implements PasswordRequestAuthentica
     }
 
     public DummyAuthorizationLoader(DummyConfiguration dummyConfiguration) {
-        this(dummyConfiguration.getUserName(), dummyConfiguration.getPassword(),
-                Collections.singleton(DefaultGroupsAndRolesAuthorization.create(dummyConfiguration.getGroups(), dummyConfiguration.getRoles())));
+        this(dummyConfiguration.getUserName(), dummyConfiguration.getPassword(), createAuthorizations(dummyConfiguration));
+    }
+
+    private static Set<Authorization> createAuthorizations(DummyConfiguration dummyConfiguration) {
+        List<Authorization> authorizations = Arrays.asList(
+                DefaultGroupsAuthorization.create(dummyConfiguration.getGroups()),
+                DefaultRolesAuthorization.create(dummyConfiguration.getRoles()));
+        return Collections.unmodifiableSet(new LinkedHashSet<>(authorizations));
     }
 }

@@ -5,8 +5,10 @@ import io.codeleaf.sec.Permissions;
 
 import java.util.Set;
 
-public interface Authorizer {
+public interface Authorizer<P extends Permissions> {
 
-    boolean isAuthorized(Permissions permissions, Set<Authorization> authorizations);
+    Class<P> getPermissionsType();
+
+    boolean isAuthorized(P permissions, Set<Authorization> authorizations);
 
 }

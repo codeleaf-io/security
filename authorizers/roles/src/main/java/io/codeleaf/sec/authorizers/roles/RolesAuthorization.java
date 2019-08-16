@@ -1,4 +1,4 @@
-package io.codeleaf.sec.authz;
+package io.codeleaf.sec.authorizers.roles;
 
 import io.codeleaf.sec.Authorization;
 
