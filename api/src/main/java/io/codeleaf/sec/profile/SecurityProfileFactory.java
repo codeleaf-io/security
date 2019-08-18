@@ -2,6 +2,7 @@ package io.codeleaf.sec.profile;
 
 import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.common.behaviors.impl.DefaultRegistry;
+import io.codeleaf.common.utils.Types;
 import io.codeleaf.config.Configuration;
 import io.codeleaf.config.impl.AbstractConfigurationFactory;
 import io.codeleaf.config.spec.InvalidSettingException;
@@ -46,8 +47,25 @@ public final class SecurityProfileFactory extends AbstractConfigurationFactory<S
             for (String name : securityProfile.getRegistry().getNames(SecurityProfileAware.class)) {
                 securityProfile.getRegistry().lookup(name, SecurityProfileAware.class).init(securityProfile);
             }
+            for (String name : securityProfile.getRegistry().getNames()) {
+                initObject(securityProfile.getRegistry().lookup(name));
+            }
         } catch (SecurityException cause) {
             throw new InvalidSpecificationException(specification, "Failed to initialize objects: " + cause.getMessage(), cause);
+        }
+    }
+
+    private void initObject(Object object) throws SecurityException {
+        if (object == null) {
+            return;
+        }
+        try {
+            if (Types.definesMethod(object.getClass(), "init")) {
+                Method method = object.getClass().getMethod("init");
+                method.invoke(object);
+            }
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException cause) {
+            throw new SecurityException("Failed to initialize object: " + cause.getMessage(), cause);
         }
     }
 

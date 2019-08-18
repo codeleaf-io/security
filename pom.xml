@@ -27,6 +27,8 @@
         <module>jaxrs/api</module>
         <module>jaxrs/authenticators/basic</module>
         <module>jaxrs/protocols/query</module>
+        <module>idgen/dsa</module>
+        <module>all</module>
     </modules>
 
     <developers>
@@ -48,6 +50,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sec-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-idgen-dsa</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -98,6 +105,11 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sec-store-local</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
