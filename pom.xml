@@ -26,6 +26,7 @@
         <module>jaxrs/spi</module>
         <module>jaxrs/api</module>
         <module>jaxrs/authenticators/basic</module>
+        <module>jaxrs/authenticators/LDAP</module>
         <module>jaxrs/protocols/query</module>
         <module>idgen/dsa</module>
         <module>all</module>
