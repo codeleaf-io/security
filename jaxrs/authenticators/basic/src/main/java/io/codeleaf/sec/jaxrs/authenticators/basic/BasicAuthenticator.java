@@ -2,6 +2,7 @@ package io.codeleaf.sec.jaxrs.authenticators.basic;
 
 import io.codeleaf.common.utils.StringEncoder;
 import io.codeleaf.sec.Authentication;
+import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.jaxrs.spi.JaxrsRequestAuthenticator;
 import io.codeleaf.sec.password.spi.Credentials;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package io.codeleaf.sec.jaxrs.authenticators.ldap;
+package io.codeleaf.sec.password.ldap;
 
 import io.codeleaf.common.behaviors.Registry;
 import io.codeleaf.config.spec.InvalidSettingException;
@@ -18,7 +18,6 @@ public final class LdapConfigurationFactory extends RegistryAwareConfigurationFa
     public LdapConfiguration parseConfiguration(Specification specification, Registry registry) throws InvalidSpecificationException {
         try {
             return new LdapConfiguration(
-                    getAuthenticator(specification, registry),
                     getHost(specification),
                     getPort(specification),
                     getDnsDomainNameComponent(specification),
@@ -33,19 +32,6 @@ public final class LdapConfigurationFactory extends RegistryAwareConfigurationFa
     private int getPort(Specification specification) throws SettingNotFoundException, InvalidSettingException {
         return specification.hasSetting("port") ? Specifications.parseInt(specification, "port") : -1;
 
-    }
-
-    private LdapAuthenticator getAuthenticator(Specification specification, Registry registry) throws InvalidSpecificationException {
-        String authenticatorName = Specifications.parseString(specification, "LdapAuthenticator");
-        LdapAuthenticator authenticator = registry.lookup(authenticatorName, LdapAuthenticator.class);
-        if (authenticator == null) {
-            throw new InvalidSpecificationException(specification, "No authenticator found with name: " + authenticatorName);
-        }
-        return authenticator;
-    }
-
-    private boolean getPrompt(Specification specification) throws SettingNotFoundException, InvalidSettingException {
-        return !specification.hasSetting("prompt") || Specifications.parseBoolean(specification, "prompt");
     }
 
     public String getHost(Specification specification) throws InvalidSpecificationException {

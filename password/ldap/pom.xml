@@ -6,19 +6,15 @@
         <groupId>io.codeleaf.sec</groupId>
         <artifactId>security</artifactId>
         <version>0.1.0</version>
-        <relativePath>../../..</relativePath>
+        <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>sec-jaxrs-authenticator-ldap</artifactId>
+    <artifactId>sec-password-ldap</artifactId>
 
-    <name>Security :: JAX-RS :: Authenticators :: LDAP</name>
+    <name>Security :: Password :: LDAP</name>
     <description>Jaxrs ldap authentication extensions</description>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sec-jaxrs-spi</artifactId>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sec-password-spi</artifactId>

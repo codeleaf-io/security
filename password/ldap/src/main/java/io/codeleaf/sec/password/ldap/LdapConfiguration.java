@@ -1,4 +1,4 @@
-package io.codeleaf.sec.jaxrs.authenticators.ldap;
+package io.codeleaf.sec.password.ldap;
 
 import io.codeleaf.config.Configuration;
 
@@ -35,24 +35,18 @@ public final class LdapConfiguration implements Configuration {
     private final static String INITIAL_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
     private final static String PROTOCOL = "ldap";
 
-    private final LdapAuthenticator authenticator;
     private final String host;
     private final int port;
     private final String dnsDomainNameComponent;
     private final String organizationalUnit;
     private final String organizationName;
 
-    public LdapConfiguration(LdapAuthenticator authenticator, String host, int port, String dnsDomainNameComponent, String organizationalUnit, String organizationName) {
-        this.authenticator = authenticator;
+    public LdapConfiguration(String host, int port, String dnsDomainNameComponent, String organizationalUnit, String organizationName) {
         this.host = host;
         this.port = port;
         this.dnsDomainNameComponent = dnsDomainNameComponent;
         this.organizationalUnit = organizationalUnit;
         this.organizationName = organizationName;
-    }
-
-    public LdapAuthenticator getAuthenticator() {
-        return authenticator;
     }
 
     public String getHost() {
@@ -74,4 +68,13 @@ public final class LdapConfiguration implements Configuration {
     public int getPort() {
         return port;
     }
+
+    public String getLdapUrl() {
+        return "ldap://" + getHost() + ":" + getPort();
+    }
+
+    public String getBase() {
+        return "ou=" + getOrganizationalUnit() + "dc=" + getDnsDomainNameComponent();
+    }
+
 }
