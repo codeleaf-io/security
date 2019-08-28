@@ -28,18 +28,14 @@ ST      stateOrProvinceName
 STREET  streetAddress
 UID     userid
 */
-
-
 public final class LdapConfiguration implements Configuration {
-
-    private final static String INITIAL_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
-    private final static String PROTOCOL = "ldap";
 
     private final String host;
     private final int port;
     private final String dnsDomainNameComponent;
     private final String organizationalUnit;
     private final String organizationName;
+    private final LdapEnvironment.Factory factory;
 
     public LdapConfiguration(String host, int port, String dnsDomainNameComponent, String organizationalUnit, String organizationName) {
         this.host = host;
@@ -47,6 +43,7 @@ public final class LdapConfiguration implements Configuration {
         this.dnsDomainNameComponent = dnsDomainNameComponent;
         this.organizationalUnit = organizationalUnit;
         this.organizationName = organizationName;
+        this.factory = new LdapEnvironment.Factory(this);
     }
 
     public String getHost() {
@@ -75,6 +72,10 @@ public final class LdapConfiguration implements Configuration {
 
     public String getBase() {
         return "ou=" + getOrganizationalUnit() + "dc=" + getDnsDomainNameComponent();
+    }
+
+    public LdapEnvironment.Factory getEnvironmentFactory() {
+        return factory;
     }
 
 }
