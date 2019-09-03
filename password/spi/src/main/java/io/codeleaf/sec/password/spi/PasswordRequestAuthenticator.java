@@ -1,6 +1,7 @@
 package io.codeleaf.sec.password.spi;
 
 import io.codeleaf.sec.Authentication;
+import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.spi.Authenticator;
 
 public interface PasswordRequestAuthenticator extends Authenticator {
