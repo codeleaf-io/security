@@ -1,0 +1,38 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.codeleaf.sec</groupId>
+        <artifactId>security</artifactId>
+        <version>0.9.0</version>
+        <relativePath>../../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>sec-jaxrs-authenticator-form</artifactId>
+
+    <name>Security :: JAX-RS :: Authenticator :: Form</name>
+    <description>Jaxrs form authentication extensions</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-password-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.codeleaf.config</groupId>
+            <artifactId>config-api</artifactId>
+            <version>${leaf-config.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.codeleaf.common</groupId>
+            <artifactId>common-libs-logging</artifactId>
+            <version>${leaf-common.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -5,8 +5,7 @@
     <parent>
         <groupId>io.codeleaf.sec</groupId>
         <artifactId>security</artifactId>
-        <version>0.1.0</version>
-        <relativePath>..</relativePath>
+        <version>0.9.0</version>
     </parent>
 
     <artifactId>sec-all</artifactId>
@@ -69,6 +68,34 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sec-jaxrs-authenticator-basic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-authenticator-form</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-authenticator-jwt</artifactId>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>${project.groupId}</groupId>-->
+<!--            <artifactId>sec-jaxrs-authenticator-oauth</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>${project.groupId}</groupId>-->
+<!--            <artifactId>sec-jaxrs-authenticator-saml</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-authenticator-select</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-protocol-cookie</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-protocol-header</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

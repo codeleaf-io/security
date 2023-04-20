@@ -5,14 +5,14 @@
     <parent>
         <groupId>io.codeleaf.sec</groupId>
         <artifactId>security</artifactId>
-        <version>0.1.0</version>
-        <relativePath>../../..</relativePath>
+        <version>0.9.0</version>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>sec-jaxrs-protocol-query</artifactId>
 
     <name>Security :: JAX-RS :: Protocol :: Query</name>
-    <description>Jaxrs header protocol</description>
+    <description>Jaxrs query protocol</description>
 
     <dependencies>
         <dependency>

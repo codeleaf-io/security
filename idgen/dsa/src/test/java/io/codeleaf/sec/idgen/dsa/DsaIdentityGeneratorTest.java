@@ -3,8 +3,8 @@ package io.codeleaf.sec.idgen.dsa;
 import io.codeleaf.common.behaviors.Identity;
 import io.codeleaf.sec.SecurityException;
 import io.codeleaf.sec.spi.IdentityGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class DsaIdentityGeneratorTest {
 
@@ -18,7 +18,7 @@ public class DsaIdentityGeneratorTest {
         Identity result = generator.generate("test");
 
         // Then
-        Assert.assertEquals("test", result.getPrincipal().getName());
+        Assertions.assertEquals("test", result.getPrincipal().getName());
     }
 
     @Test
@@ -32,7 +32,7 @@ public class DsaIdentityGeneratorTest {
         Identity result = generator.generate("sameName");
 
         // Then
-        Assert.assertNotEquals(identity.getPublicId(), result.getPublicId());
-        Assert.assertNotEquals(identity, result);
+        Assertions.assertNotEquals(identity.getPublicId(), result.getPublicId());
+        Assertions.assertNotEquals(identity, result);
     }
 }

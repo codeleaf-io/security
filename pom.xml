@@ -5,12 +5,12 @@
     <parent>
         <groupId>io.codeleaf.release</groupId>
         <artifactId>release</artifactId>
-        <version>0.1.0</version>
+        <version>0.9.0</version>
     </parent>
 
     <groupId>io.codeleaf.sec</groupId>
     <artifactId>security</artifactId>
-    <version>0.1.0</version>
+    <version>0.9.0</version>
     <packaging>pom</packaging>
 
     <name>Security Library</name>
@@ -27,6 +27,13 @@
         <module>jaxrs/spi</module>
         <module>jaxrs/api</module>
         <module>jaxrs/authenticators/basic</module>
+        <module>jaxrs/authenticators/form</module>
+        <module>jaxrs/authenticators/jwt</module>
+<!--        <module>jaxrs/authenticators/oauth</module>-->
+<!--        <module>jaxrs/authenticators/saml</module>-->
+        <module>jaxrs/authenticators/select</module>
+        <module>jaxrs/protocols/cookie</module>
+        <module>jaxrs/protocols/header</module>
         <module>jaxrs/protocols/query</module>
         <module>idgen/dsa</module>
         <module>all</module>
@@ -96,6 +103,41 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>sec-jaxrs-authenticator-basic</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-authenticator-form</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-authenticator-jwt</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>${project.groupId}</groupId>-->
+<!--                <artifactId>sec-jaxrs-authenticator-oauth</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+<!--            <dependency>-->
+<!--                <groupId>${project.groupId}</groupId>-->
+<!--                <artifactId>sec-jaxrs-authenticator-saml</artifactId>-->
+<!--                <version>${project.version}</version>-->
+<!--            </dependency>-->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-authenticator-select</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-protocol-cookie</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sec-jaxrs-protocol-header</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

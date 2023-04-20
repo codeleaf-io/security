@@ -1,0 +1,42 @@
+<project>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.codeleaf.sec</groupId>
+        <artifactId>security</artifactId>
+        <version>0.9.0</version>
+        <relativePath>../../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>sec-jaxrs-authenticator-jwt</artifactId>
+
+    <name>Security :: JAX-RS :: Authenticator :: JWT</name>
+    <description>Jaxrs JWT authentication extensions</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.codeleaf.config</groupId>
+            <artifactId>config-api</artifactId>
+            <version>${leaf-config.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.codeleaf.common</groupId>
+            <artifactId>common-libs-logging</artifactId>
+            <version>${leaf-common.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-jaxrs-protocol-query</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sec-store-client</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
